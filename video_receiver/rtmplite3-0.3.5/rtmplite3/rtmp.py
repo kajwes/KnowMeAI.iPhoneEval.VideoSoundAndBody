@@ -821,6 +821,7 @@ class App(object):
             return FLV(_debug).open(path)
         elif (mode == 'live' or mode in ('record', 'append')) and _recording:
             path = getfilename(path, name, root)
+            print("New recording started at " + path)
             return FLV(_debug).open(path, mode)
         return None
 
