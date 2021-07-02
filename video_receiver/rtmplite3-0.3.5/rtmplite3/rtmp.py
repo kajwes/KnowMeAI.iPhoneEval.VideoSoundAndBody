@@ -675,7 +675,8 @@ class Server(object):
                     print('connection received from', remote)
                 sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)  # make it non-block
                 sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1) # Issue #106
-                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 10) # Issue #106
+#KAJ: Following line Not supported on MacOs. See this article: https://github.com/stolencatkarma/CataclysmLD/issues/13
+                # sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 10) # Issue #106
                 sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 10) # Issue #106
                 sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 2) # Issue #106
                 client = Client(sock, self)

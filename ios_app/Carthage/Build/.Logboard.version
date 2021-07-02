@@ -1,0 +1,19 @@
+{
+  "commitish" : "2.2.2",
+  "iOS" : [
+    {
+      "swiftToolchainVersion" : "5.3.2 (swiftlang-1200.0.45 clang-1200.0.32.28)",
+      "hash" : "a01e7d810367293fc8ebde6601f272a8f887b022a093fe928202b597bae34039",
+      "name" : "Logboard",
+      "container" : "Logboard.xcframework",
+      "identifier" : "ios-arm64_armv7"
+    },
+    {
+      "swiftToolchainVersion" : "5.3.2 (swiftlang-1200.0.45 clang-1200.0.32.28)",
+      "hash" : "2532dece45e92205595fe8678a1019610ee93603b3cd0c7f8b0b7a219a7e0c0c",
+      "name" : "Logboard",
+      "container" : "Logboard.xcframework",
+      "identifier" : "ios-arm64_i386_x86_64-simulator"
+    }
+  ]
+}
