@@ -4,6 +4,12 @@ import Photos
 import UIKit
 import VideoToolbox
 
+// modules for body detection:
+import ARKit
+import RealityKit
+
+
+
 final class ExampleRecorderDelegate: DefaultAVRecorderDelegate {
     static let `default` = ExampleRecorderDelegate()
 
@@ -37,7 +43,14 @@ final class LiveViewController: UIViewController {
     @IBOutlet private weak var audioBitrateSlider: UISlider!
     @IBOutlet private weak var fpsControl: UISegmentedControl!
     @IBOutlet private weak var effectSegmentControl: UISegmentedControl!
+    @IBOutlet var arView: ARView!
+    
+    // The 3D character to display.
+    var character: BodyTrackedEntity?
+    let characterOffset: SIMD3<Float> = [-1.0, 0, 0] // Offset the character by one meter to the left
+    let characterAnchor = AnchorEntity()
 
+    // Video Streaming
     private var rtmpConnection = RTMPConnection()
     private var rtmpStream: RTMPStream!
     private var sharedObject: RTMPSharedObject!
