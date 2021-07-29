@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -17,9 +16,10 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Gme-VA-sgd" customClass="MTHKView" customModule="HaishinKit">
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="J8v-PG-wWR" customClass="MTHKView" customModule="HaishinKit">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                                <viewLayoutGuide key="safeArea" id="h8f-2Q-C5a"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <viewLayoutGuide key="safeArea" id="vvf-eb-wCj"/>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                             </view>
                             <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="32" minValue="15" maxValue="120" translatesAutoresizingMaskIntoConstraints="NO" id="aKS-oc-LrT">
@@ -146,19 +146,15 @@
                             <constraint firstItem="oVn-9L-n2U" firstAttribute="leading" secondItem="LTk-1V-jZa" secondAttribute="trailing" constant="16" id="TIx-vj-Qkh"/>
                             <constraint firstItem="xxe-Wi-b9E" firstAttribute="trailing" secondItem="ioi-3B-kK8" secondAttribute="trailing" constant="16" id="Tw6-jv-tFG"/>
                             <constraint firstItem="xxe-Wi-b9E" firstAttribute="bottom" secondItem="aKS-oc-LrT" secondAttribute="bottom" constant="8" id="VXV-L1-EAE"/>
-                            <constraint firstItem="xxe-Wi-b9E" firstAttribute="trailing" secondItem="Gme-VA-sgd" secondAttribute="trailing" id="WGA-8W-z7H"/>
                             <constraint firstItem="kaV-Nf-KmS" firstAttribute="leading" secondItem="dLf-ee-K3I" secondAttribute="trailing" constant="16" id="XZC-rZ-A2O"/>
                             <constraint firstItem="4s5-OW-qAO" firstAttribute="leading" secondItem="xxe-Wi-b9E" secondAttribute="leading" constant="16" id="bBy-aT-OSg"/>
                             <constraint firstItem="fbC-rC-wNg" firstAttribute="top" secondItem="2Sy-na-foy" secondAttribute="bottom" constant="8" id="bxt-Jk-DKC"/>
-                            <constraint firstItem="Gme-VA-sgd" firstAttribute="leading" secondItem="xxe-Wi-b9E" secondAttribute="leading" id="c1b-Eg-nyX"/>
                             <constraint firstItem="yIo-MW-aK8" firstAttribute="leading" secondItem="oVn-9L-n2U" secondAttribute="trailing" constant="16" id="chn-8P-gE4"/>
                             <constraint firstItem="LTk-1V-jZa" firstAttribute="top" secondItem="xxe-Wi-b9E" secondAttribute="top" id="evp-pO-uXQ"/>
-                            <constraint firstItem="Gme-VA-sgd" firstAttribute="top" secondItem="tsR-hK-woN" secondAttribute="top" id="hUp-G6-TEb"/>
                             <constraint firstItem="2Sy-na-foy" firstAttribute="top" secondItem="yIo-MW-aK8" secondAttribute="bottom" constant="8" id="jY5-kd-Sch"/>
                             <constraint firstItem="4s5-OW-qAO" firstAttribute="top" secondItem="dLf-ee-K3I" secondAttribute="bottom" constant="-16" id="js0-NN-jOe"/>
                             <constraint firstItem="aKS-oc-LrT" firstAttribute="top" secondItem="gR3-9k-qhK" secondAttribute="bottom" constant="-16" id="kaM-Nj-Bti"/>
                             <constraint firstItem="xxe-Wi-b9E" firstAttribute="bottom" secondItem="ioi-3B-kK8" secondAttribute="bottom" constant="16" id="mhN-Dj-nSh"/>
-                            <constraint firstAttribute="bottom" secondItem="Gme-VA-sgd" secondAttribute="bottom" id="pWV-nr-agp"/>
                             <constraint firstItem="aKS-oc-LrT" firstAttribute="leading" secondItem="xxe-Wi-b9E" secondAttribute="leading" constant="16" id="pnK-uc-yzU"/>
                             <constraint firstItem="yIo-MW-aK8" firstAttribute="top" secondItem="xxe-Wi-b9E" secondAttribute="top" id="r3c-6X-KrF"/>
                             <constraint firstItem="Qnn-SP-eWm" firstAttribute="leading" secondItem="xxe-Wi-b9E" secondAttribute="leading" constant="16" id="rQf-n5-l5u"/>
@@ -174,7 +170,7 @@
                         <outlet property="currentFPSLabel" destination="YMl-Xb-JZb" id="k4n-rH-YcZ"/>
                         <outlet property="effectSegmentControl" destination="2Sy-na-foy" id="25f-W4-fWk"/>
                         <outlet property="fpsControl" destination="fbC-rC-wNg" id="t4h-VS-Pmd"/>
-                        <outlet property="lfView" destination="Gme-VA-sgd" id="lgg-bN-G69"/>
+                        <outlet property="lfView" destination="J8v-PG-wWR" id="GmX-i1-7Te"/>
                         <outlet property="pauseButton" destination="ioi-3B-kK8" id="Afy-2V-jam"/>
                         <outlet property="publishButton" destination="kaV-Nf-KmS" id="6yv-vb-8Vp"/>
                         <outlet property="videoBitrateLabel" destination="dLf-ee-K3I" id="hto-Gs-HwU"/>

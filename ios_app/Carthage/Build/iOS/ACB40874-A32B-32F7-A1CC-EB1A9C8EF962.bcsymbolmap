@@ -3,7 +3,7 @@ Apple clang version 12.0.0 (clang-1200.0.32.29)
 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.4.sdk
 iPhoneOS14.4.sdk
 /Users/vidarsolli/Library/Caches/org.carthage.CarthageKit/DerivedData/12.4_12D4e/Logboard/2.2.2/Build/Intermediates.noindex/ArchiveIntermediates/Logboard iOS/IntermediateBuildFilesPath/Logboard.build/Release-iphoneos/Logboard iOS.build/DerivedSources/Logboard_vers.c
-/Users/vidarsolli/Desktop/source/HaishinKit.swift/Carthage/Checkouts/Logboard
+/Users/vidarsolli/Desktop/source/KnowMeAI.iPhoneEval.VideoSoundAndBody/ios_app/Carthage/Checkouts/Logboard
 _$s8LogboardAAC4DataV4date10Foundation4DateVvM.resume.0
 _$s8LogboardAAC4DataV10Foundation4DateVIetMAlYl_TC
 _$s8LogboardAAC4DataV5levelAB5LevelOvM.resume.0
@@ -162,7 +162,7 @@ ___swift_reflection_version
 Apple clang version 12.0.0 (clang-1200.0.32.28)
 <swift-imported-modules>
 Apple Swift version 5.3.2 (swiftlang-1200.0.45 clang-1200.0.32.28)
-/Users/vidarsolli/Desktop/source/HaishinKit.swift/Carthage/Checkouts/Logboard/Sources/Logboard/Logboard.Data.swift
+/Users/vidarsolli/Desktop/source/KnowMeAI.iPhoneEval.VideoSoundAndBody/ios_app/Carthage/Checkouts/Logboard/Sources/Logboard/Logboard.Data.swift
 objectdestroy.2
 <compiler-generated>
 objectdestroy
@@ -343,7 +343,7 @@ date.get
 _symbolic $s8Logboard0A8AppenderP
 _$s8Logboard0A8Appender_pMF
 _$s8LogboardMXM
-/Users/vidarsolli/Desktop/source/HaishinKit.swift/Carthage/Checkouts/Logboard/Sources/Logboard/LogboardAppender.swift
+/Users/vidarsolli/Desktop/source/KnowMeAI.iPhoneEval.VideoSoundAndBody/ios_app/Carthage/Checkouts/Logboard/Sources/Logboard/LogboardAppender.swift
 _$s8Logboard12NullAppenderC6append_5level7message4file8function4lineyA2AC_AJ5LevelOSayypGs12StaticStringVAOSitF
 _$s8Logboard12NullAppenderC6append_5level6format9arguments4file8function4lineyA2AC_AK5LevelOSSs7CVarArg_ps12StaticStringVAPSitF
 _$s8Logboard12NullAppenderCAA0aC0A2aDP6append_5level7message4file8function4lineyA2AC_AL5LevelOSayypGs12StaticStringVAQSitFTW
@@ -354,7 +354,7 @@ _$s8Logboard12NullAppenderCMf
 _symbolic _____ 8Logboard12NullAppenderC
 _$s8Logboard12NullAppenderCMF
 _objc_classes
-/Users/vidarsolli/Desktop/source/HaishinKit.swift/Carthage/Checkouts/Logboard/Sources/Logboard/NullAppender.swift
+/Users/vidarsolli/Desktop/source/KnowMeAI.iPhoneEval.VideoSoundAndBody/ios_app/Carthage/Checkouts/Logboard/Sources/Logboard/NullAppender.swift
 $s8Logboard12NullAppenderCMa
 append
 deinit
@@ -382,7 +382,7 @@ _$s8Logboard13MultiAppenderCMf
 _symbolic _____ 8Logboard13MultiAppenderC
 _symbolic Say______pG 8Logboard0A8AppenderP
 _$s8Logboard13MultiAppenderCMF
-/Users/vidarsolli/Desktop/source/HaishinKit.swift/Carthage/Checkouts/Logboard/Sources/Logboard/MultiAppender.swift
+/Users/vidarsolli/Desktop/source/KnowMeAI.iPhoneEval.VideoSoundAndBody/ios_app/Carthage/Checkouts/Logboard/Sources/Logboard/MultiAppender.swift
 $s8Logboard13MultiAppenderCMa
 $ss16IndexingIteratorV4next7ElementQzSgyFSay8Logboard0E8Appender_pG_Tg5
 $sSayxGSlsSl9formIndex5aftery0B0Qzz_tFTW8Logboard0D8Appender_p_Ti5
@@ -482,7 +482,7 @@ _$s8LogboardAAC5LevelOSYAAMA
 _$s8LogboardAAC5LevelOSYAAMcMK
 _$s8LogboardAAC5LevelOs23CustomStringConvertibleAAMcMK
 -private-discriminator _F7CCF2053C21BB6F470789B258583BDC
-/Users/vidarsolli/Desktop/source/HaishinKit.swift/Carthage/Checkouts/Logboard/Sources/Logboard/Logboard.swift
+/Users/vidarsolli/Desktop/source/KnowMeAI.iPhoneEval.VideoSoundAndBody/ios_app/Carthage/Checkouts/Logboard/Sources/Logboard/Logboard.swift
 $sS2SSysWl
 $ss17_NativeDictionaryV7_insert2at3key5valueys10_HashTableV6BucketV_xnq_ntFSS_8LogboardAKCTg5
 Swift runtime failure: Dictionary literal contains duplicate keys
@@ -596,7 +596,7 @@ _symbolic SaySSG
 _$sSaySSGMD
 _$sSaySSGSayxGSKsWL
 _$sSaySSGML
-/Users/vidarsolli/Desktop/source/HaishinKit.swift/Carthage/Checkouts/Logboard/Sources/Logboard/ConsoleAppender.swift
+/Users/vidarsolli/Desktop/source/KnowMeAI.iPhoneEval.VideoSoundAndBody/ios_app/Carthage/Checkouts/Logboard/Sources/Logboard/ConsoleAppender.swift
 $sSaySSGMa
 $sSaySSGSayxGSKsWl
 $sypWOc
@@ -802,7 +802,7 @@ _$s8Logboard9NetSocketC10didTimeoutyyFTq
 _$s8Logboard9NetSocketCN
 _OBJC_CLASS_$__TtC8Logboard9NetSocket
 -private-discriminator _C36F56C5321AEB2C020D40FCEA59465D
-/Users/vidarsolli/Desktop/source/HaishinKit.swift/Carthage/Checkouts/Logboard/Sources/Logboard/SocketAppender.swift
+/Users/vidarsolli/Desktop/source/KnowMeAI.iPhoneEval.VideoSoundAndBody/ios_app/Carthage/Checkouts/Logboard/Sources/Logboard/SocketAppender.swift
 $s8Logboard9NetSocketC7connect8withName4portySS_SitFyycfU_TA
 objectdestroy.17
 deinitConnection
