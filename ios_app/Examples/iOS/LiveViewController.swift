@@ -64,7 +64,7 @@ final class LiveViewController: UIViewController, ARSessionDelegate {
     @IBOutlet private weak var audioBitrateSlider: UISlider!
     @IBOutlet private weak var fpsControl: UISegmentedControl!
     @IBOutlet private weak var effectSegmentControl: UISegmentedControl!
-    //@IBOutlet private weak var arView: ARView!
+    @IBOutlet private weak var arView: ARView!
     
     // The 3D character to display.
     var character: BodyTrackedEntity?
@@ -73,7 +73,7 @@ final class LiveViewController: UIViewController, ARSessionDelegate {
     
     // ARKit
     //let arSession = ARSession()
-    let arView = ARSCNView()
+    //let arView = ARSCNView()
     
     // Video Streaming
     private var rtmpConnection = RTMPConnection()
@@ -285,8 +285,6 @@ final class LiveViewController: UIViewController, ARSessionDelegate {
     // Code from Body tracking sample app below:
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        //arView.session.delegate = self
-        
         // If the iOS device doesn't support body tracking, raise a developer error for
         // this unhandled case.
         guard ARBodyTrackingConfiguration.isSupported else {
@@ -299,13 +297,16 @@ final class LiveViewController: UIViewController, ARSessionDelegate {
         arView.session.delegate = self
         //configuration.videoFormat.framesPerSecond = 15
         //arSession.run(configuration)
-        arView.preferredFramesPerSecond = 15
+        //arView.preferredFramesPerSecond = 15
+        print("Frames per second from session configuration")
+        print(configuration.videoFormat.framesPerSecond)
         arView.session.run(configuration)
         
-        //arView.scene.addAnchor(characterAnchor)
-        return
+        arView.scene.addAnchor(characterAnchor)
+        //return
         // Asynchronously load the 3D character.
         var cancellable: AnyCancellable? = nil
+        
         cancellable = Entity.loadBodyTrackedAsync(named: "character/robot").sink(
             receiveCompletion: { completion in
                 if case let .failure(error) = completion {
@@ -362,10 +363,16 @@ final class LiveViewController: UIViewController, ARSessionDelegate {
         }
     }
     func sessionWasInterrupted(_ session: ARSession) {
-        logger.warn("AR Session was interrupted")
+        logger.warn("AR Session was interrupted. Tracking state is:")
     }
     func sessionInterruptionEnded(_ session: ARSession) {
         logger.warn("AR Session interruption ended")
+        
+    }
+    func sessionShouldAttemptRelocalization(_ session: ARSession) -> Bool
+    {
+        logger.warn("AR Session should attempt relocalization")
+        return true
     }
     func to_double_arr(vec : simd_float4)->Array<Float>//[Float; Float; Float; Float]
     {
@@ -396,9 +403,7 @@ final class LiveViewController: UIViewController, ARSessionDelegate {
             print("bodyAnchor Not Tracked")
         }
         var jsonDict : [String: Any] = [:]
-        
-        // let pose_sk = self.sceneView.pointOfView!.transform
-        
+                
         let cam_k = frame.camera.intrinsics
         let proj = frame.camera.projectionMatrix
         let pose_frame = frame.camera.transform
@@ -411,7 +416,7 @@ final class LiveViewController: UIViewController, ARSessionDelegate {
         jsonDict["time"] = time
         let date = Date()
         let format = DateFormatter()
-        format.dateFormat = "yyyy-MM-dd HH:mm:ss.SSSS"
+        format.dateFormat = "yyyy-MM-dd_HH_mm_ss.SSS"
         let timestamp = format.string(from: date)
         jsonDict["timestamp_readable"] = timestamp
 

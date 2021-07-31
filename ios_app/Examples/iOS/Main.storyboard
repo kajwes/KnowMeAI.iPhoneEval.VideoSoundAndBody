@@ -16,10 +16,19 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="J8v-PG-wWR" customClass="MTHKView" customModule="HaishinKit">
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tRH-Cd-O6j" userLabel="LF VIew" customClass="MTHKView" customModule="HaishinKit">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <viewLayoutGuide key="safeArea" id="vvf-eb-wCj"/>
+                                <viewLayoutGuide key="safeArea" id="LQR-2x-e54"/>
+                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <accessibility key="accessibilityConfiguration">
+                                    <accessibilityTraits key="traits" notEnabled="YES"/>
+                                </accessibility>
+                            </view>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rus-k7-CvE" userLabel="AR VIew" customClass="ARView" customModule="RealityKit">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <viewLayoutGuide key="safeArea" id="42I-p7-n6l"/>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                             </view>
                             <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="32" minValue="15" maxValue="120" translatesAutoresizingMaskIntoConstraints="NO" id="aKS-oc-LrT">
@@ -165,12 +174,13 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="Recording" image="first" id="acW-dT-cKf" userLabel="Recording"/>
                     <connections>
+                        <outlet property="arView" destination="rus-k7-CvE" id="lhq-zc-CbO"/>
                         <outlet property="audioBitrateLabel" destination="gR3-9k-qhK" id="KH8-U9-YKe"/>
                         <outlet property="audioBitrateSlider" destination="aKS-oc-LrT" id="b72-LB-0BW"/>
                         <outlet property="currentFPSLabel" destination="YMl-Xb-JZb" id="k4n-rH-YcZ"/>
                         <outlet property="effectSegmentControl" destination="2Sy-na-foy" id="25f-W4-fWk"/>
                         <outlet property="fpsControl" destination="fbC-rC-wNg" id="t4h-VS-Pmd"/>
-                        <outlet property="lfView" destination="J8v-PG-wWR" id="GmX-i1-7Te"/>
+                        <outlet property="lfView" destination="tRH-Cd-O6j" id="6Li-Vd-Nj4"/>
                         <outlet property="pauseButton" destination="ioi-3B-kK8" id="Afy-2V-jam"/>
                         <outlet property="publishButton" destination="kaV-Nf-KmS" id="6yv-vb-8Vp"/>
                         <outlet property="videoBitrateLabel" destination="dLf-ee-K3I" id="hto-Gs-HwU"/>
