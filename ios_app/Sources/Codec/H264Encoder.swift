@@ -179,7 +179,7 @@ public final class H264Encoder {
             kVTCompressionPropertyKey_AverageBitRate: Int(bitrate) as NSObject,
             kVTCompressionPropertyKey_ExpectedFrameRate: NSNumber(value: expectedFPS),
             kVTCompressionPropertyKey_MaxKeyFrameIntervalDuration: NSNumber(value: maxKeyFrameIntervalDuration),
-            kVTCompressionPropertyKey_AllowFrameReordering: !isBaseline as NSObject,
+            kVTCompressionPropertyKey_AllowFrameReordering: false as NSObject, // !isBaseline as NSObject,
             kVTCompressionPropertyKey_PixelTransferProperties: [
                 "ScalingMode": scalingMode.rawValue
             ] as NSObject

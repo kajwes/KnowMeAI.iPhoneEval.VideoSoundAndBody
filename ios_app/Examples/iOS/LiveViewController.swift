@@ -53,29 +53,28 @@ final class ExampleRecorderDelegate: DefaultAVRecorderDelegate {
 final class LiveViewController: UIViewController, ARSessionDelegate {
     private static let maxRetryCount: Int = 5
 
-    @IBOutlet private weak var lfView: MTHKView!
     @IBOutlet private weak var currentFPSLabel: UILabel!
     @IBOutlet private weak var publishButton: UIButton!
     @IBOutlet private weak var pauseButton: UIButton!
     @IBOutlet private weak var videoBitrateLabel: UILabel!
     @IBOutlet private weak var videoBitrateSlider: UISlider!
     @IBOutlet private weak var audioBitrateLabel: UILabel!
-    @IBOutlet private weak var zoomSlider: UISlider!
     @IBOutlet private weak var audioBitrateSlider: UISlider!
     @IBOutlet private weak var fpsControl: UISegmentedControl!
-    @IBOutlet private weak var effectSegmentControl: UISegmentedControl!
-    @IBOutlet private weak var arView: ARView!
-    
+
     // The 3D character to display.
     var character: BodyTrackedEntity?
     let characterOffset: SIMD3<Float> = [-1.0, 0, 0] // Offset the character by one meter to the left
     let characterAnchor = AnchorEntity()
     
-    // ARKit
-    //let arSession = ARSession()
-    //let arView = ARSCNView()
+    // MARK: - ARKit
+    let metalDevice: MTLDevice = MTLCreateSystemDefaultDevice()!
+    var arMultimediaIO: ARMultimediaIO!
+    weak var arView: ARView? {
+        return arMultimediaIO.arView
+    }
     
-    // Video Streaming
+    // MARK: - Video Streaming
     private var rtmpConnection = RTMPConnection()
     private var rtmpStream: RTMPStream!
     private var sharedObject: RTMPSharedObject!
@@ -86,62 +85,64 @@ final class LiveViewController: UIViewController, ARSessionDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        // MARK: - Config the RTMP stream and set ARKit as the audio/video source
         rtmpStream = RTMPStream(connection: rtmpConnection)
-        if let orientation = DeviceUtil.videoOrientation(by: UIApplication.shared.statusBarOrientation) {
-            rtmpStream.orientation = orientation
+        rtmpStream.videoSettings[.profileLevel] = kVTProfileLevel_H264_High_AutoLevel // Important — without High profile, it's impossible to stream 1080p
+        
+        // MARK: - Config the ARKit video/audio source
+        arMultimediaIO = ARMultimediaIO(metalDevice: metalDevice)
+        arMultimediaIO.delegate = self
+        
+        // Enumerate viable ARKit video formats
+        let availableVideoFormats = ARBodyTrackingConfiguration.supportedVideoFormats
+        for (idx, fmt) in availableVideoFormats.enumerated() {
+            print("Video format #\(idx): \(fmt)")
         }
-        rtmpStream.captureSettings = [
-            .sessionPreset: AVCaptureSession.Preset.hd1280x720,
-            .continuousAutofocus: true,
-            .continuousExposure: true
-            // .preferredVideoStabilizationMode: AVCaptureVideoStabilizationMode.auto
+        let selectedVideoFormat = availableVideoFormats[1] //.last! // Usually, the last video format has the lowest resolution (e.g. 1280x720 px)
+        
+        // Start the camera capture process
+        arMultimediaIO.startCameraStream(videoFormat: selectedVideoFormat)
+        
+        self.onFPSValueChanged(self.fpsControl)
+        
+        // Place the ARSCNView to the screen
+        let arPreview = arMultimediaIO.arView
+        let bgView = self.view!
+        bgView.addSubview(arPreview)
+        arPreview.translatesAutoresizingMaskIntoConstraints = false
+        let arPreviewConstraints = [
+            NSLayoutConstraint(item: arPreview, attribute: .centerX, relatedBy: .equal, toItem: bgView, attribute: .centerX, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: arPreview, attribute: .centerY, relatedBy: .equal, toItem: bgView, attribute: .centerY, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: arPreview, attribute: .width, relatedBy: .equal, toItem: bgView, attribute: .width, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: arPreview, attribute: .height, relatedBy: .equal, toItem: bgView, attribute: .height, multiplier: 1, constant: 0),
         ]
-        rtmpStream.videoSettings = [
-            .width: 720,
-            .height: 1280
-        ]
-        rtmpStream.mixer.recorder.delegate = ExampleRecorderDelegate.shared
-
+        NSLayoutConstraint.activate(arPreviewConstraints)
+        bgView.addConstraints(arPreviewConstraints)
+        bgView.sendSubviewToBack(arPreview)
+        
+        // Adjust bitrate sliders
         videoBitrateSlider?.value = Float(RTMPStream.defaultVideoBitrate) / 1000
         audioBitrateSlider?.value = Float(RTMPStream.defaultAudioBitrate) / 1000
 
-        NotificationCenter.default.addObserver(self, selector: #selector(on(_:)), name: UIDevice.orientationDidChangeNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackground(_:)), name: UIApplication.didEnterBackgroundNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(didBecomeActive(_:)), name: UIApplication.didBecomeActiveNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(on(_:)), name: UIDevice.orientationDidChangeNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackground(_:)), name: UIApplication.didEnterBackgroundNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(didBecomeActive(_:)), name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
         logger.info("viewWillAppear")
         super.viewWillAppear(animated)
-        rtmpStream.attachAudio(AVCaptureDevice.default(for: .audio)) { error in
-            logger.warn(error.description)
-        }
-        rtmpStream.attachCamera(DeviceUtil.device(withPosition: currentPosition)) { error in
-            logger.warn(error.description)
-        }
-        rtmpStream.addObserver(self, forKeyPath: "currentFPS", options: .new, context: nil)
-        lfView?.attachStream(rtmpStream)
+        
+        rtmpStream.attachARMultimediaSource(self.arMultimediaIO)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         logger.info("viewWillDisappear")
         super.viewWillDisappear(animated)
-        rtmpStream.removeObserver(self, forKeyPath: "currentFPS")
+//        rtmpStream.removeObserver(self, forKeyPath: "currentFPS")
         rtmpStream.close()
         rtmpStream.dispose()
-        
-        arView.session.pause()
-    }
-
-    @IBAction func rotateCamera(_ sender: UIButton) {
-        logger.info("rotateCamera")
-        let position: AVCaptureDevice.Position = currentPosition == .back ? .front : .back
-        rtmpStream.captureSettings[.isVideoMirrored] = position == .front
-        rtmpStream.attachCamera(DeviceUtil.device(withPosition: position)) { error in
-            logger.warn(error.description)
-        }
-        currentPosition = position
     }
 
     @IBAction func toggleTorch(_ sender: UIButton) {
@@ -156,9 +157,6 @@ final class LiveViewController: UIViewController, ARSessionDelegate {
         if slider == videoBitrateSlider {
             videoBitrateLabel?.text = "video \(Int(slider.value))/kbps"
             rtmpStream.videoSettings[.bitrate] = slider.value * 1000
-        }
-        if slider == zoomSlider {
-            rtmpStream.setZoomFactor(CGFloat(slider.value), ramping: true, withRate: 5.0)
         }
     }
 
@@ -229,15 +227,23 @@ final class LiveViewController: UIViewController, ARSessionDelegate {
     }
 
     @IBAction private func onFPSValueChanged(_ segment: UISegmentedControl) {
+        
+        var newFPS: Double? = nil
+        
         switch segment.selectedSegmentIndex {
         case 0:
-            rtmpStream.captureSettings[.fps] = 15.0
+            newFPS = 15.0
         case 1:
-            rtmpStream.captureSettings[.fps] = 30.0
+            newFPS = 30.0
         case 2:
-            rtmpStream.captureSettings[.fps] = 60.0
+            newFPS = 60.0
         default:
             break
+        }
+        
+        if let newFPS = newFPS {
+            rtmpStream.captureSettings[.fps] = newFPS
+            self.arMultimediaIO.setFPS(Int(newFPS))
         }
     }
 
@@ -282,27 +288,12 @@ final class LiveViewController: UIViewController, ARSessionDelegate {
     }
     
     
-    // Code from Body tracking sample app below:
+    // MARK: - Code from Body tracking sample app below:
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        // If the iOS device doesn't support body tracking, raise a developer error for
-        // this unhandled case.
-        guard ARBodyTrackingConfiguration.isSupported else {
-            fatalError("This feature is only supported on devices with an A12 chip")
-        }
 
-        // Run a body tracking configration.
-        let configuration = ARBodyTrackingConfiguration()
-        //arSession.delegate = self
-        arView.session.delegate = self
-        //configuration.videoFormat.framesPerSecond = 15
-        //arSession.run(configuration)
-        //arView.preferredFramesPerSecond = 15
-        print("Frames per second from session configuration")
-        print(configuration.videoFormat.framesPerSecond)
-        arView.session.run(configuration)
+        arView?.scene.addAnchor(characterAnchor)
         
-        arView.scene.addAnchor(characterAnchor)
         //return
         // Asynchronously load the 3D character.
         var cancellable: AnyCancellable? = nil
@@ -324,9 +315,18 @@ final class LiveViewController: UIViewController, ARSessionDelegate {
             }
         })
     }
+}
+
+extension LiveViewController : ARMultimediaIODelegate {
+    func onRGBVideoResolutionChanged(width: Int, height: Int) {
+        rtmpStream.videoSettings = [
+            .width: width,
+            .height: height
+        ]
+        logger.info("onRGBResolutionChanged: \(width)x\(height)")
+    }
     
-    func session(_ session: ARSession, didUpdate anchors: [ARAnchor]) {
-        print("ARSession didUpdate")
+    func onAnchorsUpdate(session: ARSession, anchors: [ARAnchor]) {
         for anchor in anchors {
             guard let bodyAnchor = anchor as? ARBodyAnchor else { continue }
             //if publishing {
@@ -338,7 +338,7 @@ final class LiveViewController: UIViewController, ARSessionDelegate {
             // Also copy over the rotation of the body anchor, because the skeleton's pose
             // in the world is relative to the body anchor's rotation.
             characterAnchor.orientation = Transform(matrix: bodyAnchor.transform).rotation
-   
+
             if let character = character, character.parent == nil {
                 // Attach the character to its anchor as soon as
                 // 1. the body anchor was detected and
@@ -347,173 +347,4 @@ final class LiveViewController: UIViewController, ARSessionDelegate {
             }
         }
     }
-    func session(_ session: ARSession, didFailWithError error: Error) {
-        // Present an error message to the user
-        print("ARSession failed with error" + error.localizedDescription)
-    }
-    func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
-        if case .normal = camera.trackingState {
-            logger.info("Normal camera tracking state detected")
-        }
-        if case .limited(let reason) = camera.trackingState {
-            logger.warn("Limited camera tracking state detected")
-        }
-        if case .notAvailable = camera.trackingState {
-            logger.error("No camera tracking available detected")
-        }
-    }
-    func sessionWasInterrupted(_ session: ARSession) {
-        logger.warn("AR Session was interrupted. Tracking state is:")
-    }
-    func sessionInterruptionEnded(_ session: ARSession) {
-        logger.warn("AR Session interruption ended")
-        
-    }
-    func sessionShouldAttemptRelocalization(_ session: ARSession) -> Bool
-    {
-        logger.warn("AR Session should attempt relocalization")
-        return true
-    }
-    func to_double_arr(vec : simd_float4)->Array<Float>//[Float; Float; Float; Float]
-    {
-        //return vec[0] as Float
-        return [vec[0] as Float, vec[1] as Float, vec[2] as Float, vec[3] as Float]
-    }
-    func to_double_arr(vec : simd_float3)->Array<Float>//[Float; Float; Float; Float]
-    {
-        //return vec[0] as Float
-        return [vec[0] as Float, vec[1] as Float, vec[2] as Float]
-    }
-    func to_2d_arr(matrix: simd_float3x3)->Array<Array<Float>>
-    {
-        //return vec[0] as Float
-        return [to_double_arr(vec: matrix.columns.0), to_double_arr(vec: matrix.columns.1), to_double_arr(vec: matrix.columns.2)]
-    }
-    func to_2d_arr(matrix: simd_float4x4)->Array<Array<Float>>
-    {
-        //return vec[0] as Float
-        return [to_double_arr(vec: matrix.columns.0), to_double_arr(vec: matrix.columns.1), to_double_arr(vec: matrix.columns.2), to_double_arr(vec: matrix.columns.3)]
-    }
-
-    func saveMetadata( frame : ARFrame, time : CFTimeInterval, frameIndex : Int, bodyAnchor: ARBodyAnchor ) {
-        if (bodyAnchor.isTracked){
-            print("bodyAnchor Is Tracked")
-        }
-        else{
-            print("bodyAnchor Not Tracked")
-        }
-        var jsonDict : [String: Any] = [:]
-                
-        let cam_k = frame.camera.intrinsics
-        let proj = frame.camera.projectionMatrix
-        let pose_frame = frame.camera.transform
-        
-        //let tracking = frame.camera.trackingState // how do we turn into string?
-        
-        jsonDict["frame_index"] = frameIndex
-
-        // Add timestamps
-        jsonDict["time"] = time
-        let date = Date()
-        let format = DateFormatter()
-        format.dateFormat = "yyyy-MM-dd_HH_mm_ss.SSS"
-        let timestamp = format.string(from: date)
-        jsonDict["timestamp_readable"] = timestamp
-
-        jsonDict["cameraPoseScenekit"] = 0// todo: pose_sk.rowMajorArray
-        jsonDict["cameraPoseARFrame"] = to_2d_arr(matrix: pose_frame)
-        jsonDict["camera_intrinsics"] = to_2d_arr(matrix: cam_k)
-        jsonDict["camera_projectionMatrix"] = to_2d_arr(matrix: proj)
-        
-        //jsonDict["isARKitTrackingNormal"] = (tracking == ARCamera.TrackingState.normal)
-        
-        
-        var joints : [String : Any] = [:]
-        
-        jsonDict["estimatedScaleFactor"] = bodyAnchor.estimatedScaleFactor
-        jsonDict["isTracked"] = bodyAnchor.isTracked
-        
-        let hipWorldPosition = bodyAnchor.transform
-        jsonDict["hip_world_position"] = to_2d_arr(matrix: hipWorldPosition)
-        // Joints relatove to hip
-        let jointTransforms = bodyAnchor.skeleton.jointModelTransforms
-
-        for (i, jointTransform) in jointTransforms.enumerated(){
-            let parentIndex = bodyAnchor.skeleton.definition.parentIndices[i]
-            let jointName = bodyAnchor.skeleton.definition.jointNames[i]
-            guard parentIndex != -1 else{ continue}
-            let parentJointTransform = jointTransforms[parentIndex]
-            
-            var jointCoords : [String : Any] = [:]
-            jointCoords["translation"] = to_double_arr(vec : jointTransform.columns.3)
-            jointCoords["parent_translation"] = to_double_arr(vec : parentJointTransform.columns.3)
-            jointCoords["is_tracked"] = bodyAnchor.skeleton.isJointTracked(i)
-            joints[jointName] = jointCoords
-        }
-        
-        jsonDict["bodyData"] = joints
-
-        //var jsonDictTest : [String: Any] = [:]
-        //jsonDictTest["bodyData"] = joints
-        
-        let host_url = Preference.defaultInstance.uri?.replacingOccurrences(of: "rtmp://", with: "http://")
-        let host_url2 = host_url?.replacingOccurrences(of: "/live", with: ":5000")
-        print(host_url2)
-        sendJsonData(urlPath: host_url2!, jsonDict: jsonDict)
-    }
-    
-    func sendJsonData(urlPath : String, jsonDict : [String: Any] ){
-        do{
-            
-            let data = try JSONSerialization.data(withJSONObject: jsonDict, options: .prettyPrinted)
-            //let jsonString = String(data: data, encoding: String.Encoding.utf8) // the data will be converted to the string
-            //print(jsonString, terminator:"")// <-- here is ur string
-
-            //let urlPath: String = "YOUR URL HERE"
-            let url: NSURL = NSURL(string: urlPath)!
-            let request1: NSMutableURLRequest = NSMutableURLRequest(url: url as URL)
-
-            request1.httpMethod = "POST"
-                //let stringPost="deviceToken=123456" // Key and Value
-
-            //let data = payload.data(using: <#String.Encoding#>)//, usingEncoding: String.Encoding.utf8)
-
-            request1.timeoutInterval = 60
-            request1.httpBody=data
-            request1.httpShouldHandleCookies=false
-
-            let queue:OperationQueue = OperationQueue()
-
-            NSURLConnection.sendAsynchronousRequest(request1 as URLRequest, queue: queue, completionHandler:{ (response: URLResponse?, data: Data?, error: Error?) -> Void in
-
-                    do {
-                        print("response from http server")
-                        //if let jsonResult = try JSONSerialization.jsonObject(with: data!, options: []) as? NSDictionary {
-                        //    print("ASynchronous\(jsonResult)")
-                        //}
-                    } catch let error as NSError {
-                        print(error.localizedDescription)
-                    }
-
-
-                })
- 
-        } catch let error as NSError {
-            print(error.localizedDescription)
-        }
-
-    }
-    // TODO: error handle
-    func saveJsonFile( fileUrl : URL , jsonDict : [String : Any] ) {
-        
-        if let jsonData = try? JSONSerialization.data(withJSONObject: jsonDict, options: [.prettyPrinted] )
-        {
-            try! jsonData.write(to: fileUrl )
-        } else {
-            print("err saving")
-        }
-
-        
-    }
-
 }

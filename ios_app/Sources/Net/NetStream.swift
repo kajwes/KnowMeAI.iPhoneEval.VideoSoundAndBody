@@ -1,6 +1,7 @@
 import AVFoundation
 import CoreImage
 
+
 /// The `NetStream` class is the foundation of a RTMPStream, HTTPStream.
 open class NetStream: NSObject {
     private static let queueKey = DispatchSpecificKey<UnsafeMutableRawPointer>()
@@ -64,6 +65,22 @@ open class NetStream: NSObject {
     }
 
 #if os(iOS) || os(macOS)
+    open func attachARMultimediaSource(_ source: IMultimediaSampleProvider) {
+        lockQueue.async { [weak self] in
+            guard let self = self else { return }
+            
+            // Instead of `try self.mixer.videoIO.attachCamera(camera)`
+            source.onNewVideoSample = { [weak self] (framSampleBuffer: CMSampleBuffer) in
+                self?.mixer.videoIO.encodeSampleBuffer(framSampleBuffer)
+            }
+            
+            // Instead of `try self.mixer.audioIO.attachAudio(audio, automaticallyConfiguresApplicationAudioSession: automaticallyConfiguresApplicationAudioSession)`
+            source.onNewAudioSample = { [weak self] (audioSample: CMSampleBuffer) in
+                self?.mixer.audioIO.encoder.encodeSampleBuffer(audioSample)
+            }
+        }
+    }
+    
     open func attachCamera(_ camera: AVCaptureDevice?, onError: ((_ error: NSError) -> Void)? = nil) {
         lockQueue.async {
             do {
